@@ -46,6 +46,7 @@ training2 = filtertraindata[-inTrain,]
 ```
 
 ## Slide with Plotly Ouput
+Interactive 3D Plot from Machine Learning - Enjoy!
 ```{r Plots, webgl=TRUE, echo = FALSE, message=FALSE, warning = FALSE, results = "rmarkdown" }
 
 # Create lists for axis properties
