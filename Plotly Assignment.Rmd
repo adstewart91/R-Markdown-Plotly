@@ -1,5 +1,5 @@
 ---
-title: "Plotly Assignment"
+title: "Week 3 - Plotly Assignment"
 author: "Andrew Stewart"
 date: "30 October 2017"
 output:
@@ -41,15 +41,12 @@ inTrain = createDataPartition(y=filtertraindata$classe, p = 0.7,list=FALSE)
 training1 = filtertraindata[inTrain,]
 training2 = filtertraindata[-inTrain,]
 
+## Save to: https://adstewart91.github.io/R-Markdown-Plotly/Plotly_Assignment.html
+
 ```
 
-
 ## Slide with Plotly Ouput
-
-```{r Plots, webgl=TRUE, echo = FALSE, message=FALSE, warning = FALSE, results = "asis" }
-
-## m <- list(l = 50, r = 50, b = 100, t = 100, pad = 4)
-## layout(autosize = F, width = 600, height = 600, margin = m)
+```{r Plots, webgl=TRUE, echo = FALSE, message=FALSE, warning = FALSE, results = "rmarkdown" }
 
 # Create lists for axis properties
 f1 <- list(
@@ -73,18 +70,19 @@ scene = list(
   xaxis = c(axis, title = "roll belt"),
   yaxis = c(axis, title = "pitch belt"),
   zaxis = c(axis, title = "yaw belt"),
-  camera = list(eye = list(x = -1.25, y = 1.25, z = 0.25)))
+  camera = list(eye = list(x = -1.25, y = 1.75, z = 0.25)))
+
+m <- list(l = 10, r = 10, b = 20, t = 30, pad = 4)
 
 data4plotly <- data.frame(x=training1$roll_belt, y=training1$pitch_belt, z=training1$yaw_belt)
 
 p <- plot_ly(data4plotly, x = ~x, y = ~y, z = ~z, type = 'scatter3d', mode = 'markers', showlegend = TRUE, color = I(as.numeric(training1$classe)+1)) %>%
-  layout(title = "3D Scatter plot of Training Data", scene = scene)
-        
+  layout(title = "3D Scatter plot of Training Data", scene = scene, margin = m)
+
+## layout(autosize = F, width = 600, height = 600, margin = m)
+
 p
 
-##main="Rotate-able 3D Plot of Training Set for pitch_belt, roll_belt, yaw_belt by Classe Type", sub="***** Use Mouse/Cursor to Zoom, Move, and Rotate *****"))
-
-## legend3d("right", pch = 19, yjust=0, cex=0.75, legend = levels(training1$classe), col = (1 + seq_along(levels(training1$classe))))
 ```
 
 ## Slide with References:
