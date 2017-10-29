@@ -1,0 +1,104 @@
+---
+title: "Plotly Assignment"
+author: "Andrew Stewart"
+date: "30 October 2017"
+output:
+  ioslides_presentation: default
+  
+---
+
+```{r Libraries and Setup, echo=FALSE, results="hide", message=FALSE, warning = FALSE}
+library(knitr)
+library(dplyr)
+library(plotly)
+library(rgl)
+library(caret)
+
+knitr::opts_chunk$set(echo = TRUE, results = "asis")
+knit_hooks$set(webgl = hook_webgl)
+
+## Read activity.csv and format as tbl_df
+actyTrainData <- read.csv("pml-training.csv", header = TRUE)
+actyTrainData <- tbl_df(actyTrainData)
+
+## Make a copy to use to partition
+traindata <- tbl_df(actyTrainData)
+
+## Read Column names
+keepcolnames <-colnames(traindata)
+
+## Create vector of column names to keep (remove summary statistic column names)
+names_vector <- !(grepl("^(kurtosis)",keepcolnames) | grepl("^(skewness)",keepcolnames) | grepl("^(max)",keepcolnames) | grepl("^(min)",keepcolnames) | grepl("^(amplitude)",keepcolnames)| grepl("^(var)",keepcolnames) | grepl("^(avg)",keepcolnames) | grepl("^(stddev)",keepcolnames) )
+
+## Select only column names with senor data
+filtertraindata <- select(traindata,keepcolnames[names_vector])
+
+## Remove first seven (7) columns of non-sensor data
+filtertraindata <- select(filtertraindata,-c(1:7))
+
+## Partition the Traing data into two Training sets for cross-validation
+inTrain = createDataPartition(y=filtertraindata$classe, p = 0.7,list=FALSE)
+training1 = filtertraindata[inTrain,]
+training2 = filtertraindata[-inTrain,]
+
+```
+
+
+## Slide with Plotly Ouput
+
+```{r Plots, webgl=TRUE, echo = FALSE, message=FALSE, warning = FALSE, results = "asis" }
+
+## m <- list(l = 50, r = 50, b = 100, t = 100, pad = 4)
+## layout(autosize = F, width = 600, height = 600, margin = m)
+
+# Create lists for axis properties
+f1 <- list(
+  family = "Arial, sans-serif",
+  size = 12,
+  color = "black")
+
+f2 <- list(
+  family = "Arial, sans-serif",
+  size = 10,
+  color = "grey")
+
+axis <- list(
+  titlefont = f1,
+  tickfont = f2,
+  showgrid = T,
+  mirror= "all"
+)
+
+scene = list(
+  xaxis = c(axis, title = "roll belt"),
+  yaxis = c(axis, title = "pitch belt"),
+  zaxis = c(axis, title = "yaw belt"),
+  camera = list(eye = list(x = -1.25, y = 1.25, z = 0.25)))
+
+data4plotly <- data.frame(x=training1$roll_belt, y=training1$pitch_belt, z=training1$yaw_belt)
+
+p <- plot_ly(data4plotly, x = ~x, y = ~y, z = ~z, type = 'scatter3d', mode = 'markers', showlegend = TRUE, color = I(as.numeric(training1$classe)+1)) %>%
+  layout(title = "3D Scatter plot of Training Data", scene = scene)
+        
+p
+
+##main="Rotate-able 3D Plot of Training Set for pitch_belt, roll_belt, yaw_belt by Classe Type", sub="***** Use Mouse/Cursor to Zoom, Move, and Rotate *****"))
+
+## legend3d("right", pch = 19, yjust=0, cex=0.75, legend = levels(training1$classe), col = (1 + seq_along(levels(training1$classe))))
+```
+
+## Slide with References:
+
+The Orignial Assignment for Machine Learning is here:
+https://adstewart91.github.io/practicalmachinelearning/Prediction_Assignment.html
+
+The training data for this project are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv  
+  
+The test data are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv  
+  
+The description of the data for this project come from this source:
+http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har.  
+
+
